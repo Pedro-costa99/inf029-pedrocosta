@@ -27,11 +27,21 @@ struct date input[TAM_LISTA_GERAL];
 struct dadosPessoa aluno[TAM_LISTA_ALUNO];
 struct dadosPessoa professor[TAM_LISTA_PROFESSOR];	
 
+//variáveis usadas para ordenar ALUNOS por data de nascimento 
+struct date input[TAM_LISTA_GERAL];
 char str1[30];
 char str2[30];
 char str3[30];
 int valor1[TAM_LISTA_GERAL], valor2[TAM_LISTA_GERAL], valor3[TAM_LISTA_GERAL];
 int somaValor[TAM_LISTA_GERAL];
+
+//variáveis usadas para ordenar PROFESSOR por data de nascimento 
+struct date input2[TAM_LISTA_GERAL];
+char str4[30];
+char str5[30];
+char str6[30];
+int valor4[TAM_LISTA_GERAL], valor5[TAM_LISTA_GERAL], valor6[TAM_LISTA_GERAL];
+int somaValor2[TAM_LISTA_GERAL];
 
 
 struct dadosDisciplina{
@@ -341,6 +351,177 @@ int listarAlunosOrdemNascimento(){
     return 0;
 }
 
+
+/******************************************************************/
+/******************************************************************/
+/******************************************************************/
+
+/******************************************************************/
+/******************************************************************/
+/******************************************************************/
+ // ABAIXO AS FUNÇÕES PRA ORDENAR NASCIMENTO PROFESSOR
+/******************************************************************/
+/******************************************************************/
+/******************************************************************/
+/******************************************************************/
+
+//funcao que quebra a data de nascimento em 3 partes, dia, mes e ano
+//quebra e transforma essas partes em número inteiro
+void quebraDataNascimentoProfessor() {
+    char str[30];
+
+    int n = TAM_LISTA_GERAL;
+    
+    //essa quantidade do for tem que estar igual a do for do cadastro aluno
+    for (int j = 0; j < n; j++)
+    {
+		    strcpy(str, professor[j].dataNascimento);
+
+		   
+		    int qtd_strings = qtd_espacos(str) + 1, i = 0;
+		    char strings[qtd_strings][strlen(str)];
+		    char *pch = strtok (str,"/");
+
+		    while (pch != NULL){
+		        strcpy(strings[i++], pch); 
+		        pch = strtok (NULL, "/");
+		    }		    
+		  
+		    
+		    //colocando as partes dentro do vetor de inteiros
+		    strcpy(str4, strings[0]);
+		    valor4[j] = atoi(str4);//dia
+
+		    strcpy(str5, strings[1]);
+		    valor5[j] = atoi(str5);//mes
+
+		    strcpy(str6, strings[2]);
+		    valor6[j] = atoi(str6);//ano
+
+		    //somando a data. Ex: 01 + 02 + 1989
+		    //utilizo esta soma para vincular corretamente a data ao nome e à matricula 
+		    somaValor2[j] = valor4[j] + valor5[j] + valor6[j];		    
+	    
+    }    
+
+    
+}
+
+
+/******************************************************************/
+/******************************************************************/
+/******************************************************************/
+
+int listarProfessoresOrdemNascimento(){
+	//ORDEM: o aluno mais velho está mais em cima	
+
+	//trazendo a data de nascimento quebrada em 3 partes
+	//e já em formato int
+	quebraDataNascimentoProfessor();
+
+	printf("\nImprimindo função listarProfessoresOrdemNascimento\n\n");	
+    
+    int n = TAM_LISTA_ALUNO;
+    int soma = -1;    
+    int i, k, p, y;	
+	
+	int lugar [n];
+	int temp;
+	int somaInput[n];
+
+	for(i=0;i<n;i++){
+	
+	input2[i].matricula = professor[i].matricula;
+	input2[i].dia = valor4[i];
+	input2[i].mes = valor5[i];
+	input2[i].ano = valor6[i];
+	strcpy(input2[i].nome, aluno[i].nome);	
+	
+	}	
+
+
+    /***********************************/
+    //ORDENAÇÂO - ordenando dia, mes e ano
+    /***********************************/
+     for (int i=0; i<n-1; i++){
+      for (int j=i+1; j<n; j++){
+         if (input2[i].ano > input2[j].ano){
+            struct date temp = input2[i];
+            input2[i] = input2[j];
+            input2[j] = temp;
+         }
+         else if (input2[i].ano == input2[j].ano && input2[i].mes > input2[j].mes){
+            struct date temp = input2[i];
+            input2[i] = input2[j];
+            input2[j] = temp;
+         }
+         else if (input2[i].ano == input2[j].ano && input2[i].mes == input2[j].mes && input2[i].dia > input2[j].dia){
+            struct date temp = input2[i];
+            input2[i] = input2[j];
+            input2[j] = temp;
+         }
+      }
+   }
+
+   /***********************************/
+    //ORDENAÇÂO
+    /***********************************/
+
+   //somando o total da data ordenada, para comparar com a ordem digitada 
+   for (int i = 0; i < n; i++)
+   {
+   	  somaInput [i] = input2[i].dia + input2[i].mes + input2[i].ano;
+   }
+
+
+    printf("\n\n");   
+ 
+    //preenchendo o vetor lugar com -1;
+   for (i = 0; i < n; i++)
+   {
+   	 lugar[i] = -1;
+   	 //printf("Lugar: %d\n", lugar[i]);
+   }
+
+    
+	printf("Matrícula ------- Nome do profº ------------------------------ Data de Nascimento\n\n");
+
+	
+    for(k=0;k<n;k++){
+    	for(p=0;p<n;p++){
+    	    	 		
+    		if(somaInput[k] == somaValor2[p] && valor4[p] == input2[k].dia && valor5[p] == input2[k].mes && valor6[p] == input2[k].ano){    			
+
+    			for (y = 0; y < n; y++)
+    			{
+    				if (p == lugar[y])
+    				{
+    					soma = 1;
+    					//para nao imprimir    					
+    					
+    				} 
+    			}
+
+    			if (soma != 1){
+    					lugar[k] = p;
+    				}    				   
+	    	
+				if(soma == -1)
+				{
+				printf("%-17d %-40s %3s %02d/%02d/%d\n",professor[p].matricula,professor[p].nome,"  ",input2[k].dia,input2[k].mes,input2[k].ano);
+				}
+
+				soma = -1; 
+				break;
+			}
+	    }	    			
+} 
+
+    printf("\n");
+	printf("\n");       
+
+    return 0;
+}
 
 /******************************************************************/
 /******************************************************************/
