@@ -3,7 +3,7 @@
 #include <string.h>
 #define TAM_LISTA_ALUNO 5
 #define TAM_LISTA_PROFESSOR 5
-#define TAM_LISTA_GERAL 5//tem que ser igual a lista_aluno ou lista_professor
+#define TAM_LISTA_GERAL 5//tem que ser igual a lista_aluno ou lista_professor ou igual os dois
 
 struct dadosPessoa{
 		//verificar tamanho da matrícula
@@ -41,7 +41,9 @@ char str4[30];
 char str5[30];
 char str6[30];
 int valor4[TAM_LISTA_GERAL], valor5[TAM_LISTA_GERAL], valor6[TAM_LISTA_GERAL];
+int valor7, valor8, valor9;
 int somaValor2[TAM_LISTA_GERAL];
+
 
 
 struct dadosDisciplina{
@@ -66,6 +68,9 @@ void cadastrarAluno(void)
 {
 	int n = TAM_LISTA_ALUNO; //quantidade de alunos
 	int len = 0;
+	int valida = 0;
+	int valida2 = 0;
+
 
 	printf("\nPara cadastrar o aluno, preencha os dados abaixo:\n\n");
 
@@ -87,11 +92,36 @@ void cadastrarAluno(void)
 	scanf("%c", &aluno[i].sexo);
 	fflush(stdin);	
 
-	printf("Informe sua data de nascimento: ");
-	fgets(aluno[i].dataNascimento, 40, stdin);
+	do{
 
-	printf("Informe seu CPF: ");
-	fgets(aluno[i].cpf, 40, stdin);
+		printf("Informe sua data de nascimento: ");
+		fgets(aluno[i].dataNascimento, 40, stdin);
+		quebraDataNascimentoAlunoValida(i);
+		if(validaDataNascimento(i,101) == 1){
+			valida = 1;			
+		} else{
+			valida = 2;
+			printf("Data de nascimento inválida!\n");
+		}
+
+	} while(valida == 2);
+	
+
+	do{
+
+		printf("Informe seu CPF: ");
+		fgets(aluno[i].cpf, 20, stdin);
+		if (validadorCpf(i, 505) == 1)
+		{
+			valida2 = 1;
+			printf("OK! CPF VALIDADO COM SUCESSO! \n");
+		} else{
+			valida2 = 2;
+			printf("CPF inválido! \n");
+		}
+		
+
+	}while(valida2 == 2);
 
 	}		
 
@@ -108,6 +138,8 @@ void cadastrarProfessor(void)
 	int i;
 	int n = TAM_LISTA_PROFESSOR;//quantidade de professores
 	int len;
+	int valida = 0;
+	int valida2 = 0;
 		
 	printf("\nPara cadastrar o Professor, preencha os dados abaixo:\n\n");
 	for (int i = 0; i < n; i++)
@@ -128,11 +160,33 @@ void cadastrarProfessor(void)
 	scanf("%c", &professor[i].sexo);
 	fflush(stdin);	
 
-	printf("Informe sua data de nascimento: ");
-	fgets(professor[i].dataNascimento, 40, stdin);
+	do{
 
-	printf("Informe seu CPF: ");
-	fgets(professor[i].cpf, 40, stdin);	
+		printf("Informe sua data de nascimento: ");
+		fgets(professor[i].dataNascimento, 40, stdin);
+		quebraDataNascimentoProfessorValida(i);
+		if(validaDataNascimento(i,102) == 1){
+			valida = 1;
+		} else{
+			valida = 2;
+			printf("Data de nascimento inválida!\n");
+		}
+
+	} while(valida == 2);
+
+	do{
+		printf("Informe seu CPF: ");
+		fgets(professor[i].cpf, 20, stdin);
+		if (validadorCpf(i, 506) == 1)
+		{
+			valida2 = 1;
+			printf("OK! CPF VALIDADO COM SUCESSO! \n");
+		} else{
+			valida2 = 2;
+			printf("CPF inválido! \n");
+		}		
+
+	}while(valida2 == 2);	
 
 	printf("\n");
 	}	
@@ -141,6 +195,221 @@ void cadastrarProfessor(void)
 	printf("\n");
 	
 }
+
+int validadorCpf(int j, int x)  
+{    
+char str[20];
+int icpf[11];  
+int i, somador=0,digito1,result1,result2,digito2,valor;   
+int tam2 = 0;
+
+if (x == 505)
+{
+	strcpy(str, aluno[j].cpf);
+	
+} else{
+	strcpy(str, professor[j].cpf);
+	
+}
+
+  
+//Efetua a conversao de array de char para um array de int.  
+for(i=0;i<11;i++)  
+{  
+icpf[i]=str[i]-48;  
+}  
+  
+//PRIMEIRO DIGITO.  
+  
+for(i=0;i<9;i++)  
+{  
+somador+=icpf[i]*(10-i);  
+}  
+  
+result1=somador%11;  
+  
+if( (result1==0) || (result1==1) )  
+{  
+digito1=0;  
+}  
+  
+else  
+{  
+digito1 = 11-result1;  
+}  
+  
+//SEGUNDO DIGITO.  
+  
+somador=0;  
+  
+for(i=0;i<10;i++)  
+{  
+somador+=icpf[i]*(11-i);  
+}  
+  
+valor=(somador/11)*11;  
+result2=somador-valor;  
+  
+if( (result2==0) || (result2==1) )  
+{  
+digito2=0;  
+}  
+  
+else  
+{  
+digito2=11-result2;  
+}  
+
+tam2 = strlen(str);
+
+
+//abaixo estou subtraindo o str2(data de nascimento) -1 porque no cadastro a string recebe um \n.
+//achei mais prático corrigir incluindo "\n" nas comparações abaixo.  
+if (tam2-1 != 11 || strcmp(str, "00000000000\n") == 0 || strcmp(str, "11111111111\n") == 0 || strcmp(str, "22222222222\n") == 0  || 
+	strcmp(str, "33333333333\n") == 0 || strcmp(str, "44444444444\n") == 0 || strcmp(str, "55555555555\n") == 0 || 
+	strcmp(str, "66666666666\n") == 0 || strcmp(str, "77777777777\n") == 0 || strcmp(str, "88888888888\n") == 0 ||
+	strcmp(str, "99999999999\n") == 0){	
+	return 2;
+} else if((digito1==icpf[9]) && (digito2==icpf[10]) && tam2-1 == 11) {  
+ 
+	return 1;
+} else{
+	return 2;
+}	
+
+ 
+}
+
+//auxilia na função validaNascimento
+void quebraDataNascimentoAlunoValida(int j) {
+
+			int qtd_espacos(char *str);
+
+    		char str[30];       
+    
+		    strcpy(str, aluno[j].dataNascimento);
+
+		   
+		    int qtd_strings = qtd_espacos(str) + 1, i = 0;
+		    char strings[qtd_strings][strlen(str)];
+		    char *pch = strtok (str,"/");
+
+		    while (pch != NULL){
+		        strcpy(strings[i++], pch); 
+		        pch = strtok (NULL, "/");
+		    }		  
+		    
+		    //colocando as partes dentro do vetor de inteiros
+		    strcpy(str1, strings[0]);
+		    valor7 = atoi(str1);//dia
+
+		    strcpy(str2, strings[1]);
+		    valor8 = atoi(str2);//mes
+
+		    strcpy(str3, strings[2]);
+		    valor9 = atoi(str3);//ano     
+
+    
+}
+
+//auxilia na função validaNascimento
+void quebraDataNascimentoProfessorValida(int j) {
+
+			int qtd_espacos(char *str);
+
+    		char str[30];       
+    
+		    strcpy(str, professor[j].dataNascimento);
+
+		   
+		    int qtd_strings = qtd_espacos(str) + 1, i = 0;
+		    char strings[qtd_strings][strlen(str)];
+		    char *pch = strtok (str,"/");
+
+		    while (pch != NULL){
+		        strcpy(strings[i++], pch); 
+		        pch = strtok (NULL, "/");
+		    }		  
+		    
+		    //colocando as partes dentro do vetor de inteiros
+		    strcpy(str1, strings[0]);
+		    valor7 = atoi(str1);//dia
+
+		    strcpy(str2, strings[1]);
+		    valor8 = atoi(str2);//mes
+
+		    strcpy(str3, strings[2]);
+		    valor9 = atoi(str3);//ano     
+
+    
+}
+
+int validaDataNascimento(int j, int x)
+{
+	//quebraDataNascimentoAlunoValida();
+    int dd = valor7;
+    int mm = valor8;
+    int yy = valor9;
+    char palavra10[30];
+
+    //printf("Enter date (DD/MM/YYYY format): ");
+    //scanf("%d %d %d", &dd, &mm, &yy);
+
+    if(x == 101){
+    	strcpy(palavra10, aluno[j].dataNascimento);
+    } else{
+    	strcpy(palavra10, professor[j].dataNascimento);
+    }
+
+    
+
+    //primeiro verifica se as barras foram colocadas corretemante nos seus lugares
+    if(palavra10[2] == '/' && palavra10[5] == '/'){
+
+    	//check year
+    if (yy >= 1900 && yy <= 9999)
+    {
+        //check month
+        if (mm >= 1 && mm <= 12)
+        {
+            //check days
+            if ((dd >= 1 && dd <= 31) && (mm == 1 || mm == 3 || mm == 5 || mm == 7 || mm == 8 || mm == 10 || mm == 12))
+                //printf("Date is valid 01.\n");
+                return 1;
+            else if ((dd >= 1 && dd <= 30) && (mm == 4 || mm == 6 || mm == 9 || mm == 11))
+                //printf("Date is valid 02.\n");
+                return 1;
+            else if ((dd >= 1 && dd <= 28) && (mm == 2))
+                //printf("Date is valid 03.\n");
+                return 1;
+            else if (dd == 29 && mm == 2 && (yy % 400 == 0 || (yy % 4 == 0 && yy % 100 != 0)))
+                //printf("Date is valid 04.\n");
+            	return 1;
+            else
+                //printf("Day is invalid 05.\n");
+                return 2;//inválido é 2
+        }
+        else
+        {
+            //printf("Month is not valid.\n");
+          	return 2;  
+        }
+    }
+    
+    else
+    {
+        //printf("Year is not valid.\n");
+        return 2;
+    }
+
+    } else{
+    	return 2;
+    }
+
+    
+
+    
+} 
 
 
 void cadastrarDisciplina(void)
